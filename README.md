@@ -5,6 +5,16 @@ Open-wt coding challenge
 
 */openwt/interview/coding/challenge/CodingChallengeApplication.java*
 
+### Buidling and running:
+
+mvn package -Dmaven.test.skip=true (skipping the testing part)
+ 
+java -jar target\CodingChallenge-0.0.1-SNAPSHOT.jar
+
+### Access Localhost
+
+curl -v -u dmorde0@patch.com:dmorde0@patch.com http://localhost:8080/contacts/
+
 ### Authentification: 
 Authentification-type: Basic authentication http
 
@@ -30,5 +40,5 @@ Managed by Liquibase (see files in folder */src/main/resources/db/changelogs*)
 * _UC1_ 
 * _UC2_
 * _UC3_
-* _UC4_ (only part 1 -> Contact Authentication)
+* _UC4_ (only part 1 -> Contact Authentication via email field)
 
