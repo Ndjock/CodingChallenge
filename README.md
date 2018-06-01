@@ -30,5 +30,5 @@ Managed by Liquibase (see files in folder */src/main/resources/db/changelogs*)
 * _UC1_ 
 * _UC2_
 * _UC3_
-* _UC4_ (only part 1)
+* _UC4_ (only part 1 -> Contact Authentication)
 
