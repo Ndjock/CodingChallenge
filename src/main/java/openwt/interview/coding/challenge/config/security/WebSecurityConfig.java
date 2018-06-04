@@ -13,26 +13,16 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
  
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-//    http.authorizeRequests().anyRequest().fullyAuthenticated().and().
-//    httpBasic().and().
-//    csrf().disable();
-//    
-//    http.authorizeRequests().anyRequest().fullyAuthenticated().and().
-//    httpBasic().and().
-//    csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    
-    
-    http.authorizeRequests()
-    .antMatchers("/contacts/**").hasAnyRole("USER")
-    .antMatchers("/skills/**").hasAnyRole("USER")
-    .anyRequest().authenticated() 
-    .and()
-//    .authorizeRequests().anyRequest().fullyAuthenticated()
-//    .and()
-    .httpBasic()
-    .and()
-    .csrf().disable()
-    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+	  http.authorizeRequests()
+	    .antMatchers("/contacts/**").hasAnyRole("USER")
+	    .antMatchers("/skills/**").hasAnyRole("USER")
+	    .anyRequest().authenticated() 
+	    .and()
+	    .httpBasic()
+	    .and()
+	    .csrf().disable()
+	    .sessionManagement()
+	    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
   }
   
   @Override
