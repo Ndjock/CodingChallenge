@@ -15,6 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +41,7 @@ import openwt.interview.coding.challenge.persistence.repos.ContactRepository;
 import openwt.interview.coding.challenge.persistence.repos.SkillRepository;
 import openwt.interview.coding.challenge.web.dto.ResultResponse;
 import openwt.interview.coding.challenge.web.error.ElementNotFoundException;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value="Contact Manager with simple CRUDing functions on contacts and their skills")
 @SwaggerDefinition()
@@ -114,20 +117,39 @@ public class ContactController {
 	@ApiOperation(value = "update an existing contact")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Contact was successfully updated"),
-	        @ApiResponse(code = 404, message = "The contact you are trying to update was not found")
+	        @ApiResponse(code = 404, message = "The contact you are trying to update was not found"),
+			@ApiResponse(code = 403, message = "The authenticated contact can't update another contact")
 	})
 	@PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Contact> updateContact(
 			@ApiParam(name="id",value="the id of the contact to be updated", required=true)
 			@PathVariable("id") Long id,
 			@ApiParam(name="contact", value="the serialized contact entity to be sent to the url to be updated")			
-			@Valid @RequestBody Contact contact) {
+			@Valid @RequestBody Contact contact,
+			@ApiIgnore
+			Authentication auth) {
+	 	
+		requireUserBeSameAsContact(auth, id, getContactChangeAuthMsg(id, auth.getName()));
+		
+		if(!isUserBeingSameContact(auth,id)) 
+			throw new AccessDeniedException("update to contact with id "+id+" forbiden for User "+auth.getName());
+
 		contactRepository.findById(id).orElseThrow(
 				() -> new ElementNotFoundException("couldn't find contact (with id: " + id + ") to update"));
 		contact.setId(id);
 		contactRepository.save(contact);
 		return new ResponseEntity<Contact>(contact, HttpStatus.OK);
 	}
+
+	private boolean isUserBeingSameContact(Authentication auth, Long id) {
+		// with authentication being done by Email
+		String password = auth.getCredentials().toString();
+		Contact contact = contactRepository
+							.findByEmail(password)
+							.orElseThrow(() ->  new ElementNotFoundException("could not find contact with email "+password));
+		return contact.getId().equals(id);
+	}
+
 
 	@ApiOperation(value = "delete an existing contact")
 	@ApiResponses(value = {
@@ -147,17 +169,21 @@ public class ContactController {
 	@ApiOperation(value = "adding a skill to a contact")
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "Skill was successfully added to the contact"),
-	        @ApiResponse(code = 404, message = "The contact/skill looked for is not present in the datastore")
+	        @ApiResponse(code = 404, message = "The contact/skill looked for is not present in the datastore"),
+			@ApiResponse(code = 403, message = "The authenticated contact can't change skills of another contact")
 	})
 	@PutMapping(value = "/{id}/skills/{skillId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> addNewSkill(
 			@ApiParam(name="id",value="the id of the contact", required=true)
 			@PathVariable("id") Long id,
-
 			@ApiParam(name="skillId",value="the id of the skill to be added", required=true)
 			@PathVariable("skillId") Long skillId,
-			UriComponentsBuilder ucBuilder) {
-
+			UriComponentsBuilder ucBuilder,
+			@ApiIgnore
+			Authentication auth) {
+		
+		requireUserBeSameAsContact(auth,id,getSkillChangeAuthMsg(id,auth.getName()));
+		
 		Contact contact = contactRepository.findById(id).orElseThrow(
 				() -> new ElementNotFoundException("couldn't find contact (with id: " + id + ") to skill addition"));
 
@@ -174,16 +200,21 @@ public class ContactController {
 	@ApiOperation(value = "removing a skill to a contact")
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "Skill was successfully removed to the contact"),
-	        @ApiResponse(code = 404, message = "The contact/skill looked for is not present in the datastore")
+	        @ApiResponse(code = 404, message = "The contact/skill looked for is not present in the datastore"),
+			@ApiResponse(code = 403, message = "The authenticated contact can't change skills of another contact")
 	})
 	@DeleteMapping(value = "/{id}/skills/{skillId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> deleteAddedSkill(
 			@ApiParam(name="id",value="the id of the contact", required=true)
 			@PathVariable("id") Long id,
-			
 			@ApiParam(name="skillId",value="the id of the skill to be removed", required=true)			
 			@PathVariable("skillId") Long skillId,
-			UriComponentsBuilder ucBuilder) {
+			UriComponentsBuilder ucBuilder,
+			@ApiIgnore
+			Authentication auth) {
+
+		requireUserBeSameAsContact(auth,id,getSkillChangeAuthMsg(id,auth.getName()));
+		
 
 		Contact contact = contactRepository.findById(id).orElseThrow(
 				() -> new ElementNotFoundException("couldn't find contact (with id: " + id + ") to delete"));
@@ -199,6 +230,29 @@ public class ContactController {
 	}
 	
 	
+	private void requireUserBeSameAsContact(Authentication auth, Long id, String msg) {
+		if(!isUserBeingSameContact(auth,id)) 
+			throw new AccessDeniedException(msg.toString());
+	}
+
+
+	private String getSkillChangeAuthMsg(Long contactId, String username) {
+		return 	new StringBuilder()
+					.append("change on skills of contact with id ")
+					.append(contactId)	
+					.append(" forbiden for User ")
+					.append(username).toString();
+	}
+	
+	private String getContactChangeAuthMsg(Long contactId, String username) {
+		return 	new StringBuilder()
+					.append("update to contact with id ")
+					.append(contactId)	
+					.append(" forbiden for User ")
+					.append(username).toString();
+	}
+
+
 	@ApiOperation(value = "View list of skills beloging to a contact")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Contact skill list is successful fetched"),
@@ -218,7 +272,9 @@ public class ContactController {
 	@GetMapping(value = "/{id}/skills", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<PagedResources<Resource<Skill>>> getContactSkills(
 			@ApiParam(name="id",value="the id of the contact", required=true)
-			@PathVariable("id") Long id, Pageable pageable, PagedResourcesAssembler<Skill> assembler) {
+			@PathVariable("id") Long id, Pageable pageable, PagedResourcesAssembler<Skill> assembler,
+			@ApiIgnore("authentication Object from Spring")
+			Authentication auth) {
 
 		Contact contact = contactRepository.findById(id).orElseThrow(
 				() -> new ElementNotFoundException("couldn't find contact (with id: " + id + ") to fetch skill from"));
