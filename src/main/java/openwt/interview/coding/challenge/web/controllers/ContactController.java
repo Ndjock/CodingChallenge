@@ -132,7 +132,7 @@ public class ContactController {
 		requireUserBeSameAsContact(auth, id, getContactChangeAuthMsg(id, auth.getName()));
 		
 		if(!isUserBeingSameContact(auth,id)) 
-			throw new AccessDeniedException("update to contact with id "+id+" forbiden for User "+auth.getName());
+			throw new AccessDeniedException("update of contact with id "+id+" forbiden for User "+auth.getName());
 
 		contactRepository.findById(id).orElseThrow(
 				() -> new ElementNotFoundException("couldn't find contact (with id: " + id + ") to update"));
@@ -246,7 +246,7 @@ public class ContactController {
 	
 	private String getContactChangeAuthMsg(Long contactId, String username) {
 		return 	new StringBuilder()
-					.append("update to contact with id ")
+					.append("update of contact with id ")
 					.append(contactId)	
 					.append(" forbiden for User ")
 					.append(username).toString();
@@ -293,5 +293,4 @@ public class ContactController {
 					"couldn't find skills (ids= " + skillIds.stream().map(i -> "" + i).collect(Collectors.joining(","))
 							+ " ) from contact (with id: " + id + ")");
 	}
-
 }
