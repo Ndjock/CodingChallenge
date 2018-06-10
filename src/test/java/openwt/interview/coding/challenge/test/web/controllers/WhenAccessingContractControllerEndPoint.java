@@ -211,7 +211,7 @@ public class WhenAccessingContractControllerEndPoint {
 		contact.setAddressLine("uipstrasse 0, 91524 fmgqjcat");
 		Mockito.when(contactRepository.save(Mockito.any(Contact.class)))
 			.thenReturn(null);
-
+ 
 		mockMvc.perform(post("/contacts/")
 						.with(SecurityMockMvcRequestPostProcessors.csrf())
 						.contentType(MediaType.APPLICATION_JSON)
