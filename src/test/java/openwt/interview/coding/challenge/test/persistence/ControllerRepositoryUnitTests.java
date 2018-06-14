@@ -3,7 +3,6 @@ package openwt.interview.coding.challenge.test.persistence;
 import javax.sql.DataSource;
 
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -60,19 +59,6 @@ public class ControllerRepositoryUnitTests {
 		for (int i = 0; i < 3; i++)
 			skillRepository.save(getValidSkill());
 
-	}
-
-	@Test
-	public void testOne() {
-
-		Contact contact = contactRepository.findById(currentContactId).get();
-		contact.addSkill(skillRepository.findById(currentSkilltId).get());
-		contact.addSkill(skillRepository.findById(currentSkilltId-1).get());
-		contact.addSkill(skillRepository.findById(currentSkilltId-2).get());
-		
-		Skill skill = skillRepository.findById(currentSkilltId).get();
-
-		skillRepository.delete(skill);
 	}
 
 	private Skill getValidSkill() {

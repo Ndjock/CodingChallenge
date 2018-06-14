@@ -281,7 +281,6 @@ public class ContactController {
 			@PathVariable("id") Long id, Pageable pageable, PagedResourcesAssembler<Skill> assembler,
 			@ApiIgnore("authentication Object from Spring")
 			Authentication auth) {
-
 		Contact contact = contactRepository.findById(id).orElseThrow(
 				() -> new ElementNotFoundException("couldn't find contact (with id: " + id + ") to fetch skill from"));
 
