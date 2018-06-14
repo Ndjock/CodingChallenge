@@ -146,7 +146,7 @@ public class ContactController {
 		String password = auth.getCredentials().toString();
 		Contact contact = contactRepository
 							.findByEmail(password)
-							.orElseThrow(() ->  new ElementNotFoundException("could not find contact with email "+password));
+							.orElseThrow(() ->  new AccessDeniedException("could not find contact with email "+password));
 		return contact.getId().equals(id);
 	}
 
@@ -159,9 +159,15 @@ public class ContactController {
 	@DeleteMapping(value = "{id}")
 	public ResponseEntity<Void> deleteContact(
 			@ApiParam(name="id",value="the id of the contact to be deleted", required=true)
-			@PathVariable("id") Long id) {
+			@PathVariable("id") Long id,
+			@ApiIgnore
+			Authentication auth) {
+		
+		requireUserBeSameAsContact(auth, id, getContactChangeAuthMsg(id, auth.getName()));
+		
 		Contact contact = contactRepository.findById(id).orElseThrow(
 				() -> new ElementNotFoundException("couldn't find contact (with id: " + id + ") to delete"));
+		contact.removeAllSkills();
 		contactRepository.delete(contact);
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
@@ -172,7 +178,7 @@ public class ContactController {
 	        @ApiResponse(code = 404, message = "The contact/skill looked for is not present in the datastore"),
 			@ApiResponse(code = 403, message = "The authenticated contact can't change skills of another contact")
 	})
-	@PutMapping(value = "/{id}/skills/{skillId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/{id}/skills/{skillId}")
 	public ResponseEntity<Void> addNewSkill(
 			@ApiParam(name="id",value="the id of the contact", required=true)
 			@PathVariable("id") Long id,
@@ -199,11 +205,11 @@ public class ContactController {
 
 	@ApiOperation(value = "removing a skill to a contact")
 	@ApiResponses(value = {
-			@ApiResponse(code = 201, message = "Skill was successfully removed to the contact"),
+			@ApiResponse(code = 200, message = "Skill was successfully removed to the contact"),
 	        @ApiResponse(code = 404, message = "The contact/skill looked for is not present in the datastore"),
 			@ApiResponse(code = 403, message = "The authenticated contact can't change skills of another contact")
 	})
-	@DeleteMapping(value = "/{id}/skills/{skillId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@DeleteMapping(value = "/{id}/skills/{skillId}")
 	public ResponseEntity<Void> deleteAddedSkill(
 			@ApiParam(name="id",value="the id of the contact", required=true)
 			@PathVariable("id") Long id,

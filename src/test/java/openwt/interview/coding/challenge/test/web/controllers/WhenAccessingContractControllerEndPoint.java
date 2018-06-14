@@ -3,6 +3,7 @@ package openwt.interview.coding.challenge.test.web.controllers;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -15,10 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -45,7 +48,6 @@ import openwt.interview.coding.challenge.web.controllers.ContactController;
 @WebMvcTest(ContactController.class)
 @WithMockUser
 @EnableSpringDataWebSupport
-@PrepareForTest
 public class WhenAccessingContractControllerEndPoint {
 
 	@Autowired
@@ -209,8 +211,6 @@ public class WhenAccessingContractControllerEndPoint {
 		contact.setEmail("saba@saba.com");
 		contact.setPhoneNumber("6219036402");
 		contact.setAddressLine("uipstrasse 0, 91524 fmgqjcat");
-		Mockito.when(contactRepository.save(Mockito.any(Contact.class)))
-			.thenReturn(null);
  
 		mockMvc.perform(post("/contacts/")
 						.with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -219,6 +219,7 @@ public class WhenAccessingContractControllerEndPoint {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 				.andExpect(jsonPath("$..details").value(hasItem(containsString("firstname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 		contact.setFirstname("asdadh2");
 		
@@ -229,6 +230,7 @@ public class WhenAccessingContractControllerEndPoint {
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 		.andExpect(jsonPath("$..details").value(hasItem(containsString("firstname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 		contact.setFirstname("  ");
 		
@@ -239,6 +241,7 @@ public class WhenAccessingContractControllerEndPoint {
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 		.andExpect(jsonPath("$..details").value(hasItem(containsString("firstname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 	
 	}
 	
@@ -252,8 +255,6 @@ public class WhenAccessingContractControllerEndPoint {
 		contact.setEmail("saba@saba.com");
 		contact.setPhoneNumber("6219036402");
 		contact.setAddressLine("uipstrasse 0, 91524 fmgqjcat");
-		Mockito.when(contactRepository.save(Mockito.any(Contact.class)))
-			.thenReturn(null);
 
 		mockMvc.perform(post("/contacts/")
 						.with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -262,6 +263,7 @@ public class WhenAccessingContractControllerEndPoint {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 				.andExpect(jsonPath("$..details").value(hasItem(containsString("lastname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 		contact.setLastname("asdadh2");
 		
@@ -272,6 +274,7 @@ public class WhenAccessingContractControllerEndPoint {
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 		.andExpect(jsonPath("$..details").value(hasItem(containsString("lastname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 		contact.setLastname("  ");
 		
@@ -282,6 +285,7 @@ public class WhenAccessingContractControllerEndPoint {
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 		.andExpect(jsonPath("$..details").value(hasItem(containsString("lastname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 	
 	}
 
@@ -295,8 +299,6 @@ public class WhenAccessingContractControllerEndPoint {
 		contact.setEmail("saba@saba.com");
 		contact.setPhoneNumber("6219036402");
 		contact.setAddressLine("uipstrasse 0, 91524 fmgqjcat");
-		Mockito.when(contactRepository.save(Mockito.any(Contact.class)))
-			.thenReturn(null);
 
 		mockMvc.perform(post("/contacts/")
 						.with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -305,6 +307,7 @@ public class WhenAccessingContractControllerEndPoint {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 				.andExpect(jsonPath("$..details").value(hasItem(containsString("fullname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 		contact.setFullname("asdadh2");
 		
@@ -315,6 +318,7 @@ public class WhenAccessingContractControllerEndPoint {
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 		.andExpect(jsonPath("$..details").value(hasItem(containsString("fullname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 		contact.setFirstname("  ");
 		
@@ -325,6 +329,7 @@ public class WhenAccessingContractControllerEndPoint {
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 		.andExpect(jsonPath("$..details").value(hasItem(containsString("fullname"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 	}
 	
@@ -338,8 +343,6 @@ public class WhenAccessingContractControllerEndPoint {
 		contact.setEmail(null);
 		contact.setPhoneNumber("6219036402");
 		contact.setAddressLine("uipstrasse 0, 91524 fmgqjcat");
-		Mockito.when(contactRepository.save(Mockito.any(Contact.class)))
-			.thenReturn(null);
 
 		mockMvc.perform(post("/contacts/")
 						.with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -348,6 +351,7 @@ public class WhenAccessingContractControllerEndPoint {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 				.andExpect(jsonPath("$..details").value(hasItem(containsString("email"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 		contact.setEmail("asdadh2");
 		
@@ -358,6 +362,7 @@ public class WhenAccessingContractControllerEndPoint {
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 		.andExpect(jsonPath("$..details").value(hasItem(containsString("email"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 		contact.setFirstname("  ");
 		
@@ -368,18 +373,19 @@ public class WhenAccessingContractControllerEndPoint {
 		.andExpect(status().isBadRequest())
 		.andExpect(jsonPath("$..message").value(hasItem("Validation Error")))
 		.andExpect(jsonPath("$..details").value(hasItem(containsString("email"))));
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 	}
 	
 	@Test
 	public void putRequestForUpdatingContactShouldReturn403UserNotSameAsContact() throws Exception {
 		// user id and contact id are not the same id;
-		Long contactId= 0L; 
+		Long contactId= 1000000L; 
 		Long userId= 1L;
 	
-		Contact mockContact = Mockito.mock(Contact.class,Mockito.RETURNS_DEEP_STUBS);
-		Mockito.when(mockContact.getId()).thenReturn(Long.valueOf(contactId));
-		Optional<Contact> optContact =  Optional.of(mockContact);
+		Contact contact = new Contact();
+		contact.setId(contactId);
+		Optional<Contact> optContact =  Optional.of(contact);
 		
 		Mockito.when(contactRepository.findByEmail(Mockito.any(String.class))).thenReturn(optContact);
 		
@@ -388,6 +394,8 @@ public class WhenAccessingContractControllerEndPoint {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(json(getValidContact())))
 				.andExpect(status().isForbidden());	
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
+
 	}
 	
 	@Test
@@ -400,41 +408,106 @@ public class WhenAccessingContractControllerEndPoint {
 				.with(SecurityMockMvcRequestPostProcessors.csrf())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json(getValidContact())))
-		.andExpect(status().isNotFound());
+		.andExpect(status().isForbidden());
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 		
 	}
 
 	@Test
 	public void putRequestForUpdatingContactShouldReturn400IfContactNotValid() throws Exception {
 		Long contactId = 1L;
-		
-		Optional<Contact> optContact =  Optional.ofNullable(null);
-		Mockito.when(contactRepository.findByEmail(Mockito.any(String.class))).thenReturn(optContact);
 		mockMvc.perform(put("/contacts/"+contactId)
 				.with(SecurityMockMvcRequestPostProcessors.csrf())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(json(getInvalidContact())))
 		.andExpect(status().isBadRequest());
+		Mockito.verify(contactRepository,Mockito.never()).save(Mockito.any(Contact.class));
 	}
 
 	@Test
-	public void putRequestForUpdatingContactShouldReturn201IfContactNotValid() throws Exception {
-		Long contactId = 1L;
+	public void putRequestForUpdatingContactShouldReturn200IfContactValid() throws Exception {
+		// user id and contact id have the same id;
+		Long contactId= 1L; 
+		Long userId= 1L;
 		
-		Optional<Contact> optContact =  Optional.ofNullable(null);
-		Mockito.when(contactRepository.findByEmail(Mockito.any(String.class))).thenReturn(optContact);
+		// return a contact with user id
+		Contact contact = new Contact();
+		contact.setId(userId);
+		Mockito.when(contactRepository.findByEmail(Mockito.any(String.class))).thenReturn(Optional.of(contact));
+		Mockito.when(contactRepository.findById(contactId)).thenReturn(Optional.of(new Contact()));
+
 		mockMvc.perform(put("/contacts/"+contactId)
 				.with(SecurityMockMvcRequestPostProcessors.csrf())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(json(getInvalidContact())))
-		.andExpect(status().isBadRequest());
+				.content(json(getValidContact())))
+		.andExpect(status().isOk());
+		
+		Mockito.verify(contactRepository, Mockito.times(1)).save(Mockito.any(Contact.class));
 	}
 	
+	@Test
+	public void deleteRequestForRemovingContactShouldReturn403IfUserNotExists() throws Exception {
+		Long userId= 1L;
 	
-	protected String json(Object o) throws IOException {
+		Mockito.when(contactRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.ofNullable(null));
+		
+		mockMvc.perform(delete("/contacts/"+userId)
+				.with(SecurityMockMvcRequestPostProcessors.csrf()))
+			.andExpect(status().isForbidden());
+		Mockito.verify(contactRepository,Mockito.never()).delete(Mockito.any());
+
+	}
+	
+	@Test
+	public void deleteRequestForRemovingContactShouldReturn403IfUserNotSameAsContact() throws Exception {
+		// user id and contact id don't have the same id;
+		Long userId= 1L;
+		Long contactId= 2L;
+		
+		Contact contact = new Contact();
+		contact.setId(userId);
+		
+		Mockito.when(contactRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(contact));
+		
+		mockMvc.perform(delete("/contacts/"+contactId)
+				.with(SecurityMockMvcRequestPostProcessors.csrf()))
+			.andExpect(status().isForbidden());
+		Mockito.verify(contactRepository,Mockito.never()).delete(Mockito.any());
+	}
+	
+	@Test
+	public void deleteRequestForRemovingContactShouldReturn200IfUserSameAsContact() throws Exception {
+		// user id and contact id don't have the same id;
+		Long userId= 1L;
+		Long contactId= 1L;
+		
+		Contact contact = new Contact();
+		contact.setId(userId);
+		
+		Mockito.when(contactRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(contact));
+		Mockito.when(contactRepository.findById(contactId)).thenReturn(Optional.of(new Contact()));
+		
+		mockMvc.perform(delete("/contacts/"+contactId)
+				.with(SecurityMockMvcRequestPostProcessors.csrf()))
+			.andExpect(status().isOk());
+		Mockito.verify(contactRepository,Mockito.times(1)).delete(Mockito.any());
+	}
+	
+
+	
+	private String json(Object o) throws IOException {
         MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();
         this.mappingJackson2HttpMessageConverter.write(
                 o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
         return mockHttpOutputMessage.getBodyAsString();
     }
+	
+	
+	@Test
+	public void testJsonToContact() throws IOException, JSONException {
+		JSONAssert.assertEquals("{id:123}", "{id:123,name:\"john\"}", JSONCompareMode.LENIENT);
+		JSONAssert.assertNotEquals("{id:123}", "{id:123,name:\"john\"}", JSONCompareMode.STRICT);
+
+	}
+	
 }

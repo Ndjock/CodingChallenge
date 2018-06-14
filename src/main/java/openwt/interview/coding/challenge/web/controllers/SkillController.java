@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,7 @@ import openwt.interview.coding.challenge.web.error.ElementNotFoundException;
 
 @RestController
 @RequestMapping("/skills")
+
 public class SkillController {
 
 	@Autowired
@@ -47,6 +49,7 @@ public class SkillController {
 	
 	@Autowired
 	private ContactRepository contactRepository;
+	
 
 	@ApiOperation(value = "${SkillController.getSkillById.value}")
 	@ApiResponses(value = {
@@ -133,6 +136,7 @@ public class SkillController {
 	        @ApiResponse(code = 404, message = "The skill you are trying to delete  was not found")
 	})
 	@DeleteMapping(value = "{id}")
+	@Transactional
 	public ResponseEntity<Void> delete(
 			@ApiParam(name="id",value="the id of the skill to be deleted")
 			@PathVariable("id") Long id) {
